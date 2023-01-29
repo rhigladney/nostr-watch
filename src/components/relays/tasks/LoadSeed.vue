@@ -26,7 +26,9 @@ import { geo } from '../../../../cache/geo.yaml'
 
 const localMethods = {
   invalidate(force){
-    if( ( this.store.tasks.getLastUpdate('relays/check') || ( this.store.tasks.processed?.['relays/check'] && this.store.tasks.processed?.['relays/check'].length ) ) && !force ) 
+    // if( ( this.store.tasks.getLastUpdate('relays/check') || ( this.store.tasks.processed?.['relays/check'] && this.store.tasks.processed?.['relays/check'].length ) ) && !force ) 
+    //   return
+    if( !this.isExpired(this.slug, 15*60*1000) && !force ) 
       return
     
     this.queueJob(
@@ -57,10 +59,15 @@ const localMethods = {
                 },
                 latency: data?.latency,
                 info: data.info,
-                uptime: this.getUptimePercentage(relay)
+                uptime: this.getUptimePercentage(relay),
+                identities: []
               }
+              if(data.info?.pubkey)
+                result.identities.push(data.info?.pubkey)
+                
               result.aggregate = this.getAggregate(result)
               this.results[relay] = result
+              this.setCache(result)
             }
           })
           .on('eose', () => {
@@ -108,6 +115,12 @@ export default defineComponent({
     
     this.store.relays.setGeo(geo)
     this.relays = Array.from(new Set(relays))
+
+    for(let ri=0;ri-this.relays.length;ri++){
+      const relay = this.relays[ri],
+            cache = this.getCache(relay)
+      this.results[relay] = cache
+    }
   },
   mounted(){
     console.log('is processing', this.store.tasks.isProcessing(this.slug))

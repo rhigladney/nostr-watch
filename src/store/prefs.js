@@ -8,7 +8,12 @@ export const usePrefsStore = defineStore('prefs', {
     rowTheme: 'comfortable',
     filters: [],
     filterFn: [],
-    useKind3: true
+    useKind3: true,
+    clientSideProcessing: false,
+    latencyFast: 20,
+    latencySlow: 1000,
+    sortUptime: true,
+    sortLatency: true, 
   }),
   getters: {
     doRefresh: (state) => state.refresh,

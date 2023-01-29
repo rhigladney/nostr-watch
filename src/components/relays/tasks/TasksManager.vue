@@ -2,9 +2,11 @@
   <HeartbeatTask 
     v-bind:resultsProp="results" />
   <LoadSeed 
-    v-bind:resultsProp="results" />
+    v-bind:resultsProp="results"
+    v-if="!store.prefs.clientSideProcessing" />
   <RefreshTask
-    v-bind:resultsProp="results" />
+    v-bind:resultsProp="results"
+    v-if="store.prefs.clientSideProcessing || isSingle" />
   <UserRelayList />
   <!-- <RelayCanonicalsTask
     :resultsProp="results" />
